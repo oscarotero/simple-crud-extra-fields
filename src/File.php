@@ -66,13 +66,7 @@ class File extends Field
             mkdir($root.$relative, 0777, true);
         }
 
-        if ($this->table->getDatabase()->getAttribute(self::ATTR_SAVE_RELATIVE_DIRECTORY)) {
-            $filename = $relative.$filename;
-        } else {
-            $root .= $relative;
-        }
-
-        $file->moveTo($root.$filename);
+        $file->moveTo($root.$relative.$filename);
 
         return $filename;
     }
