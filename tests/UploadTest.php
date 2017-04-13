@@ -33,7 +33,8 @@ EOT
     {
         $db = $this->db;
         File::register($db);
-        $db->setAttribute(File::ATTR_DIRECTORY, __DIR__.'/tmp');
+        $dir = __DIR__.'/tmp';
+        $db->setAttribute(File::ATTR_DIRECTORY, $dir);
 
         $content = 'New file content';
         $stream = fopen('php://temp', 'r+');
@@ -45,13 +46,11 @@ EOT
         ]);
 
         $file->save();
-        $fileinfo = $file->file;
 
-        $this->assertTrue($fileinfo->isFile());
-        $this->assertInstanceOf('SplFileInfo', $fileinfo);
-        $this->assertEquals(__DIR__.'/tmp/file/file/my-file.txt', $fileinfo->getPathname());
-        $this->assertEquals($content, $fileinfo->openFile()->fgets());
-        $this->assertEquals('my-file.txt', $this->db->execute('SELECT file from file')->fetchColumn(0));
+        $this->assertTrue(is_file($dir.$file->file));
+        $this->assertEquals('/file/file/my-file.txt', $file->file);
+        $this->assertEquals($content, file_get_contents($dir.$file->file));
+        $this->assertEquals('/file/file/my-file.txt', $this->db->execute('SELECT file from file')->fetchColumn(0));
 
         unlink(__DIR__.'/tmp/file/file/my-file.txt');
         rmdir(__DIR__.'/tmp/file/file');

@@ -5,7 +5,6 @@ namespace SimpleCrud\Fields;
 use Psr\Http\Message\UploadedFileInterface;
 use SimpleCrud\SimpleCrud;
 use SimpleCrud\SimpleCrudException;
-use SplFileInfo;
 
 /**
  * To save files.
@@ -15,9 +14,9 @@ class File extends Field
     use SlugifyTrait;
 
     const ATTR_DIRECTORY = 'simplecrud.file.directory';
-    const ATTR_SAVE_RELATIVE_DIRECTORY = 'simplecrud.file.save_relative_directory';
 
     protected $directory;
+    protected $relativeDirectory;
 
     public static function register(SimpleCrud $simpleCrud)
     {
@@ -35,11 +34,7 @@ class File extends Field
             return $this->upload($data);
         }
 
-        if ($data instanceof SplFileInfo) {
-            return $data->getFilename();
-        }
-
-        return $data;
+        return empty($data) ? null: $data;
     }
 
     /**
@@ -48,10 +43,10 @@ class File extends Field
     public function dataFromDatabase($data)
     {
         if (!empty($data)) {
-            return new SplFileInfo($this->getDirectory().$this->getRelativeDirectory().$data);
+            return $this->getRelativeDirectory().$data;
         }
 
-        return $data;
+        return null;
     }
 
     /**
@@ -109,15 +104,17 @@ class File extends Field
      */
     private function getDirectory()
     {
-        if ($this->directory === null) {
-            $this->directory = $this->table->getDatabase()->getAttribute(self::ATTR_DIRECTORY);
+        if (!isset($this->config['directory'])) {
+            $directory = $this->table->getDatabase()->getAttribute(self::ATTR_DIRECTORY);
 
-            if (empty($this->directory)) {
+            if (empty($directory)) {
                 throw new SimpleCrudException('No SimpleCrud\\Fields\\File::ATTR_DIRECTORY attribute found to upload files');
             }
+
+            $this->config['directory'] = $directory;
         }
 
-        return $this->directory;
+        return $this->config['directory'];
     }
 
     /**
@@ -127,6 +124,10 @@ class File extends Field
      */
     protected function getRelativeDirectory()
     {
-        return "/{$this->table->name}/{$this->name}/";
+        if (!isset($this->config['relative_directory'])) {
+            $this->config['relative_directory'] = "/{$this->table->name}/{$this->name}/";
+        }
+
+        return $this->config['relative_directory'];
     }
 }
