@@ -4,7 +4,7 @@ Package with extra fields for [simple-crud](https://github.com/oscarotero/simple
 
 ## Installation
 
-This package is installable and autoloadable via Composer as [simple-crud/simple-crud](https://packagist.org/packages/simple-crud/extra-fields).
+This package is installable and autoloadable via Composer as [simple-crud/extra-fields](https://packagist.org/packages/simple-crud/extra-fields).
 
 ```
 $ composer require simple-crud/extra-fields
