@@ -15,7 +15,12 @@ class File extends Field
 
     const ATTR_DIRECTORY = 'simplecrud.file.directory';
 
-    protected $directory;
+    protected $config = [
+        'directory' => null,
+        'relative_directory' => null,
+        'save_relative_directory' => false,
+    ];
+
     protected $relativeDirectory;
 
     public static function register(SimpleCrud $simpleCrud)
@@ -34,7 +39,15 @@ class File extends Field
             return $this->upload($data);
         }
 
-        return empty($data) ? null: $data;
+        if (empty($data)) {
+            return null;
+        }
+
+        if (!$this->config['save_relative_directory']) {
+            return basename($data);
+        }
+
+        return empty($data) ? null : $data;
     }
 
     /**
@@ -42,11 +55,15 @@ class File extends Field
      */
     public function dataFromDatabase($data)
     {
-        if (!empty($data)) {
-            return $this->getRelativeDirectory().$data;
+        if (empty($data)) {
+            return null;
         }
 
-        return null;
+        if ($this->config['save_relative_directory']) {
+            return $data;
+        }
+
+        return $this->getRelativeDirectory().$data;
     }
 
     /**
@@ -68,6 +85,10 @@ class File extends Field
 
         $file->moveTo($root.$relative.$filename);
 
+        if ($this->config['save_relative_directory']) {
+            return $relative.$filename;
+        }
+
         return $filename;
     }
 
@@ -83,12 +104,12 @@ class File extends Field
         $name = $file->getClientFilename();
 
         if ($name === '') {
-            return uniqid();
+            return '/'.uniqid();
         }
 
         $info = pathinfo($name);
 
-        return self::slugify($info['filename']).'.'.$info['extension'];
+        return '/'.self::slugify($info['filename']).'.'.$info['extension'];
     }
 
     /**
@@ -119,7 +140,7 @@ class File extends Field
     protected function getRelativeDirectory()
     {
         if (!isset($this->config['relative_directory'])) {
-            $this->config['relative_directory'] = "/{$this->table->name}/{$this->name}/";
+            $this->config['relative_directory'] = "/{$this->table->getName()}/{$this->name}";
         }
 
         return $this->config['relative_directory'];
