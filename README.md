@@ -28,6 +28,12 @@ File::register($simpleCrud);
 //Configure the directory to upload the files
 $simpleCrud->setAttribute(File::DIRECTORY, '/path/to/uploads');
 
+//You can also configure the File field
+$simpleCrud->user->file
+	->setConfig('directory', '/path/to/uploads') //custom directory used instead the default File::DIRECTORY
+	->setConfig('relative_directory', '/images') //custom subdirectory (by default is /{table_name}/{field_name})
+	->setConfig('save_relative_directory', true) //whether save the relative_directory in the database instead only the filename (false by default)
+
 //Get the data from the serverRequest
 $data = $request->getParsedBody();
 $files = $request->getUploadedFiles();

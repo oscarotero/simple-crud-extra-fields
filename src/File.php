@@ -63,7 +63,7 @@ class File extends Field
             return $data;
         }
 
-        return $this->getRelativeDirectory().$data;
+        return $this->getRelativeDirectory().'/'.$data;
     }
 
     /**
@@ -77,7 +77,7 @@ class File extends Field
     {
         $filename = $this->getFilename($file);
         $root = $this->getDirectory();
-        $relative = $this->getRelativeDirectory();
+        $relative = $this->getRelativeDirectory().'/';
 
         if (!is_dir($root.$relative)) {
             mkdir($root.$relative, 0777, true);
@@ -104,12 +104,12 @@ class File extends Field
         $name = $file->getClientFilename();
 
         if ($name === '') {
-            return '/'.uniqid();
+            return uniqid();
         }
 
         $info = pathinfo($name);
 
-        return '/'.self::slugify($info['filename']).'.'.$info['extension'];
+        return self::slugify($info['filename']).'.'.$info['extension'];
     }
 
     /**
