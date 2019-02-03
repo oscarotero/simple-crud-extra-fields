@@ -19,6 +19,7 @@ class File extends Field
         'directory' => null,
         'relative_directory' => null,
         'save_relative_directory' => false,
+        'uniq_name' => false
     ];
 
     protected $relativeDirectory;
@@ -108,6 +109,10 @@ class File extends Field
         }
 
         $info = pathinfo($name);
+
+        if ($this->config['uniq_name']) {
+            return uniqid().'.'.$info['extension'];
+        }
 
         return self::slugify($info['filename']).'.'.$info['extension'];
     }
