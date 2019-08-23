@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace SimpleCrud\Fields;
 
@@ -7,87 +8,72 @@ use SimpleCrud\SimpleCrud;
 use SimpleCrud\SimpleCrudException;
 
 /**
- * To save files.
+ * To store the files in directories and save the filename in the database.
  */
 class File extends Field
 {
     use SlugifyTrait;
 
-    const ATTR_DIRECTORY = 'simplecrud.file.directory';
+    const CONFIG_UPLOADS_PATH = 'uploads_path';
 
     protected $config = [
+        'root' => null,
         'directory' => null,
-        'relative_directory' => null,
-        'save_relative_directory' => false,
+        'save_directory' => false,
         'uniq_name' => false
     ];
 
     protected $relativeDirectory;
 
-    public static function register(SimpleCrud $simpleCrud)
+    public static function getFactory(): FieldFactory
     {
-        $fieldFactory = $simpleCrud->getFieldFactory();
-        $fieldFactory->mapNames(['file' => 'File']);
-        $fieldFactory->mapRegex(['/[a-z]File$/' => 'File']);
+        return new FieldFactory(self::class, [], ['file', '/[a-z]File$/']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function dataToDatabase($data)
+    public function formatToDatabase($value)
     {
-        if ($data instanceof UploadedFileInterface) {
-            return $this->upload($data);
+        if ($value instanceof UploadedFileInterface) {
+            return $this->upload($value);
         }
 
-        if (empty($data)) {
+        if (empty($value)) {
             return null;
         }
 
-        if (!$this->config['save_relative_directory']) {
-            return basename($data);
+        if (!$this->config['save_directory']) {
+            return basename($value);
         }
 
-        return empty($data) ? null : $data;
+        return empty($value) ? null : $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function dataFromDatabase($data)
+    public function format($value)
     {
-        if (empty($data)) {
+        if (empty($value)) {
             return null;
         }
 
-        if ($this->config['save_relative_directory']) {
-            return $data;
+        if ($this->config['save_directory']) {
+            return $value;
         }
 
-        return $this->getRelativeDirectory().'/'.$data;
+        return $this->getDirectory().'/'.$value;
     }
 
-    /**
-     * Upload the file and return the value.
-     * 
-     * @param UploadedFileInterface $file
-     * 
-     * @return string
-     */
-    private function upload(UploadedFileInterface $file)
+    private function upload(UploadedFileInterface $file): string
     {
         $filename = $this->getFilename($file);
-        $root = $this->getDirectory();
-        $relative = $this->getRelativeDirectory().'/';
+        $root = $this->getRoot();
+        $directory = $this->getDirectory().'/';
 
-        if (!is_dir($root.$relative)) {
-            mkdir($root.$relative, 0777, true);
+        if (!is_dir($root.$directory)) {
+            mkdir($root.$directory, 0777, true);
         }
 
-        $file->moveTo($root.$relative.$filename);
+        $file->moveTo($root.$directory.$filename);
 
-        if ($this->config['save_relative_directory']) {
-            return $relative.$filename;
+        if ($this->config['save_directory']) {
+            return $directory.$filename;
         }
 
         return $filename;
@@ -95,12 +81,8 @@ class File extends Field
 
     /**
      * Get the name used to save the file in lowercase and without spaces.
-     * 
-     * @param UploadedFilenameInterface $file
-     * 
-     * @return string
      */
-    private function getFilename(UploadedFileInterface $file)
+    private function getFilename(UploadedFileInterface $file): string
     {
         $name = $file->getClientFilename();
 
@@ -117,37 +99,27 @@ class File extends Field
         return self::slugify($info['filename']).'.'.$info['extension'];
     }
 
-    /**
-     * Get the directory where the file will be saved.
-     * 
-     * @return string
-     */
-    private function getDirectory()
+    private function getRoot(): string
     {
-        if (!isset($this->config['directory'])) {
-            $directory = $this->table->getDatabase()->getAttribute(self::ATTR_DIRECTORY);
+        if (!isset($this->config['root'])) {
+            $root = $this->table->getDatabase()->getConfig(self::CONFIG_UPLOADS_PATH);
 
-            if (empty($directory)) {
-                throw new SimpleCrudException('No SimpleCrud\\Fields\\File::ATTR_DIRECTORY attribute found to upload files');
+            if (empty($root)) {
+                throw new SimpleCrudException('No SimpleCrud\\Fields\\File::CONFIG_UPLOADS_PATH value found to upload files');
             }
 
-            $this->config['directory'] = $directory;
+            $this->config['root'] = $root;
+        }
+
+        return $this->config['root'];
+    }
+
+    protected function getDirectory(): string
+    {
+        if (!isset($this->config['directory'])) {
+            $this->config['directory'] = sprintf('/%s/%s', $this->table->getName(), $this->getName());
         }
 
         return $this->config['directory'];
-    }
-
-    /**
-     * Get the relative where the file will be saved.
-     * 
-     * @return string
-     */
-    protected function getRelativeDirectory()
-    {
-        if (!isset($this->config['relative_directory'])) {
-            $this->config['relative_directory'] = "/{$this->table->getName()}/{$this->name}";
-        }
-
-        return $this->config['relative_directory'];
     }
 }

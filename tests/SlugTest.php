@@ -1,18 +1,18 @@
 <?php
 namespace SimpleCrud\Tests;
 
-use SimpleCrud\SimpleCrud;
+use SimpleCrud\Database;
 use SimpleCrud\Fields\Slug;
 use PDO;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class SlugTest extends PHPUnit_Framework_TestCase
+class SlugTest extends TestCase
 {
     private $db;
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->db = new SimpleCrud(new PDO('sqlite::memory:'));
+        $this->db = new Database(new PDO('sqlite::memory:'));
 
         $this->db->executeTransaction(function ($db) {
             $db->execute(
@@ -30,7 +30,7 @@ EOT
     public function testSlug()
     {
         $db = $this->db;
-        Slug::register($db);
+        $db->setFieldFactory(Slug::getFactory());
 
         $title = 'Hello world';
         $article = $db->article->create([
@@ -38,7 +38,7 @@ EOT
             'slug' => $title,
         ]);
 
-        $article->save();
+        $article->save()->reload();
 
         $this->assertEquals('hello-world', $article->slug);
     }

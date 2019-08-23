@@ -18,8 +18,8 @@
 		"issues": "https://github.com/oscarotero/simple-crud-extra-fields/issues"
 	},
 	"require": {
-		"php": ">=5.4",
-		"simple-crud/simple-crud": "^6.9",
+		"php": ">=7.2",
+		"simple-crud/simple-crud": "dev-master",
 		"psr/http-message": "^1.0",
 		"cocur/slugify": "^3.0"
 	},
@@ -34,7 +34,7 @@
         }
     },
 	"require-dev": {
-		"phpunit/phpunit": "^5.5",
+		"phpunit/phpunit": "^8.0",
 		"zendframework/zend-diactoros": "^1.3"
 	},
 	"scripts": {

@@ -1,9 +1,9 @@
 <?php
+declare(strict_types = 1);
 
 namespace SimpleCrud\Fields;
 
 use Cocur\Slugify\Slugify;
-use SimpleCrud\SimpleCrud;
 
 /**
  * To slugify values before save.
@@ -12,17 +12,13 @@ class Slug extends Field
 {
     use SlugifyTrait;
 
-	public static function register(SimpleCrud $simpleCrud)
+    public static function getFactory(): FieldFactory
     {
-        $fieldFactory = $simpleCrud->getFieldFactory();
-        $fieldFactory->mapNames(['slug' => 'Slug']);
+        return new FieldFactory(self::class, [], ['slug']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function dataToDatabase($data)
+    protected function formatToDatabase($value)
     {
-        return self::slugify($data);
+        return self::slugify($value);
     }
 }

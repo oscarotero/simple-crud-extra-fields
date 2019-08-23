@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace SimpleCrud\Fields;
 
@@ -11,7 +12,7 @@ trait SlugifyTrait
 {
 	private static $slugify;
 
-    private static function slugify($text)
+    private static function slugify(string $text): string
     {
         if (self::$slugify === null) {
             self::$slugify = new Slugify();
