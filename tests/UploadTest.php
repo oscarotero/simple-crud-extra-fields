@@ -1,12 +1,11 @@
 <?php
 namespace SimpleCrud\Tests;
 
-use SimpleCrud\Database;
-use SimpleCrud\Table;
-use SimpleCrud\Fields\File;
-use Zend\Diactoros\UploadedFile;
 use PDO;
 use PHPUnit\Framework\TestCase;
+use SimpleCrud\Database;
+use SimpleCrud\Fields\File;
+use Zend\Diactoros\UploadedFile;
 
 class UploadTest extends TestCase
 {
@@ -18,7 +17,7 @@ class UploadTest extends TestCase
 
         $this->db->executeTransaction(function ($db) {
             $db->execute(
-<<<EOT
+<<<'EOT'
 CREATE TABLE "file" (
     `id`          INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
     `name`        TEXT,

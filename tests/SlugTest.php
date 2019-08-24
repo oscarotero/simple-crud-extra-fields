@@ -1,10 +1,10 @@
 <?php
 namespace SimpleCrud\Tests;
 
-use SimpleCrud\Database;
-use SimpleCrud\Fields\Slug;
 use PDO;
 use PHPUnit\Framework\TestCase;
+use SimpleCrud\Database;
+use SimpleCrud\Fields\Slug;
 
 class SlugTest extends TestCase
 {
@@ -16,7 +16,7 @@ class SlugTest extends TestCase
 
         $this->db->executeTransaction(function ($db) {
             $db->execute(
-<<<EOT
+<<<'EOT'
 CREATE TABLE "article" (
     `id`          INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
     `title`       TEXT,

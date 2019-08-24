@@ -20,7 +20,7 @@ class File extends Field
         'root' => null,
         'directory' => null,
         'save_directory' => false,
-        'uniq_name' => false
+        'uniq_name' => false,
     ];
 
     protected $relativeDirectory;

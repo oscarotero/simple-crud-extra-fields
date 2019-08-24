@@ -26,7 +26,7 @@ use SimpleCrud\Fields\File;
 File::register($simpleCrud);
 
 //Configure the directory to upload the files
-$simpleCrud->setAttribute(File::DIRECTORY, '/path/to/uploads');
+$simpleCrud->setConfig(File::CONFIG_UPLOADS_PATH, '/path/to/uploads');
 
 //You can also configure the File field
 $simpleCrud->user->file

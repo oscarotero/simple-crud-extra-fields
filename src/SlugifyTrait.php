@@ -10,7 +10,7 @@ use Cocur\Slugify\Slugify;
  */
 trait SlugifyTrait
 {
-	private static $slugify;
+    private static $slugify;
 
     private static function slugify(string $text): string
     {
